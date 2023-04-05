@@ -1,7 +1,7 @@
 import { Button, Heading, HStack, Img, Text, VStack } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
+import { toast } from "react-hot-toast";
 import { useDispatch } from "react-redux";
-import { addToCartReducer } from "../redux/reducer";
 
 const Products = () => {
   const [products, setProducts] = useState([]);
@@ -22,7 +22,18 @@ const Products = () => {
 
   console.log(products);
 
-  const dispach = useDispatch();
+  const dispatch = useDispatch();
+
+  const addToCartHandler = (options) => {
+    dispatch({
+      type: "addToCart",
+      payload: options,
+    });
+    dispatch({
+      type: "calculatePrice",
+    });
+    toast.success("Added to Cart");
+  };
 
   return (
     <HStack
@@ -31,40 +42,33 @@ const Products = () => {
       justifyContent={"center"}
       gap={"2rem"}
     >
-      {products.map((product) => (
-        <VStack
-          w={"52"}
-          border="1px"
-          borderColor="gray.200"
-          borderRadius={"20px"}
-          justifyContent="center"
-          alignItems={"center"}
-          p={"1rem"}
-        >
-          <Img h={"20"} src={product.image} />
-          <Text noOfLines={1}>{product.title}</Text>
-          <Heading size={"md"} noOfLines={1}>
-            ${product.price}
-          </Heading>
-          <Button
-            colorScheme="teal"
-            size="sm"
-            onClick={() =>
-              dispach(
-                addToCartReducer({
-                  id: product.id,
-                  imgSrc: product.image,
-                  name: product.title,
-                  price: product.price,
-                  quantity: 1,
-                })
-              )
-            }
+      {products.map((product) => {
+        product.quantity = 1;
+        return (
+          <VStack
+            w={"52"}
+            border="1px"
+            borderColor="gray.200"
+            borderRadius={"20px"}
+            justifyContent="center"
+            alignItems={"center"}
+            p={"1rem"}
           >
-            Add to Cart
-          </Button>
-        </VStack>
-      ))}
+            <Img h={"20"} src={product.image} />
+            <Text noOfLines={1}>{product.title}</Text>
+            <Heading size={"md"} noOfLines={1}>
+              ${product.price}
+            </Heading>
+            <Button
+              colorScheme="teal"
+              size="sm"
+              onClick={() => addToCartHandler(product)}
+            >
+              Add to Cart
+            </Button>
+          </VStack>
+        );
+      })}
     </HStack>
   );
 };
